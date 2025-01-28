@@ -447,26 +447,23 @@ int libnet_route_parse_nexthop(struct rtnl_route *rt_route, char *subopts,
 
                 case NEXTHOP_VIA:
                         if (rtnl_route_get_family(rt_route) == AF_MPLS) {
-                                if ((err_val = libnet_addr_parse(args, 0, &address)) != 0) {
-                                        return err_val;
-                                }
-                                rtnl_route_nh_set_via(nexthop, address);
-                        } else {
-                                if ((err_val = libnet_addr_parse(args, rtnl_route_get_family(rt_route), &address)) != 0) {
-                                        return err_val;
-                                }
-                                rtnl_route_nh_set_gateway(nexthop, address);
+                                 if ((err_val = libnet_addr_parse(args, 0, &address)) != 0) {
+                                 return err_val;
                         }
-                        nl_addr_put(address);
+                if ((err_val = libnet_addr_parse(args, rtnl_route_get_family(rt_route), &address)) != 0) {
+                                 return err_val;
+                        }
+                          rtnl_route_nh_set_gateway(nexthop, address);  // Using the newer function
+                        }
+                          nl_addr_put(address);
                         break;
-
                 case NEXTHOP_AS:
                         if ((err_val = libnet_addr_parse(args, rtnl_route_get_family(rt_route), &address)) != 0) {
-                                return err_val;
+                                 return err_val;
                         }
-                        rtnl_route_nh_set_newdst(nexthop, address);
-                        nl_addr_put(address);
-                        break;
+                         rtnl_route_nh_set_dst(nexthop, address);  // Changed from rtnl_route_nh_set_newdst to rtnl_route_nh_set_dst
+                         nl_addr_put(address);
+                         break;
 
                 case NEXTHOP_WEIGHT:
                         ulval = strtoul(args, &end_ptr, 0);
